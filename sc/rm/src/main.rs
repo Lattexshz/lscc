@@ -1,11 +1,8 @@
-use std::ffi::OsStr;
-use std::fs::DirEntry;
-use std::io::Error;
-use std::path::Path;
 use libsc::{wild_card, WildCardType};
+use std::path::Path;
 
 fn main() {
-    let mut args:Vec<String> = std::env::args().collect();
+    let mut args: Vec<String> = std::env::args().collect();
     if args.len() == 1 {
         std::process::exit(0);
     }
@@ -26,7 +23,7 @@ pub fn rm(p: Vec<&Path>) {
             WildCardType::AllFile => {
                 let entries = std::fs::read_dir(".").unwrap();
                 for entry in entries {
-                    delete_file(&entry.as_ref().unwrap().path(),&mut success,&mut failed)
+                    delete_file(&entry.as_ref().unwrap().path(), &mut success, &mut failed)
                 }
             }
 
@@ -36,8 +33,7 @@ pub fn rm(p: Vec<&Path>) {
                 let entries = std::fs::read_dir(".").unwrap();
                 let mut file = p.to_path_buf();
                 for entry in entries {
-
-                    let mut cp = match &mut entry.as_ref() {
+                    let cp = match &mut entry.as_ref() {
                         Ok(entry) => entry.path(),
                         Err(_) => {
                             continue;
@@ -48,26 +44,24 @@ pub fn rm(p: Vec<&Path>) {
                         None => {
                             continue;
                         }
-                        Some(ext) => ext.to_str().unwrap()
+                        Some(ext) => ext.to_str().unwrap(),
                     };
 
                     file.set_extension(ext);
 
                     match file.exists() {
-                        true => {
-                            match file.is_dir() {
-                                true => {
-                                    continue;
-                                }
-                                false => {}
+                        true => match file.is_dir() {
+                            true => {
+                                continue;
                             }
-                        }
+                            false => {}
+                        },
                         false => {
                             continue;
                         }
                     }
 
-                    delete_file(&file,&mut success,&mut failed)
+                    delete_file(&file, &mut success, &mut failed)
                 }
             }
 
@@ -76,44 +70,42 @@ pub fn rm(p: Vec<&Path>) {
                 let entries = std::fs::read_dir(".").unwrap();
                 let ext = p.extension().unwrap().to_str().unwrap();
                 for entry in entries {
-
-                    let mut p = &mut entry.as_ref().unwrap().path();
+                    let p = &mut entry.as_ref().unwrap().path();
                     p.set_extension(ext);
                     match p.exists() {
-                        true => {
-                            match p.is_dir() {
-                                true => {
-                                    continue;
-                                }
-                                false => {}
+                        true => match p.is_dir() {
+                            true => {
+                                continue;
                             }
-                        }
+                            false => {}
+                        },
                         false => {
                             continue;
                         }
                     }
-                    println!("{}",p.display());
-                    delete_file(p,&mut success,&mut failed)
+                    println!("{}", p.display());
+                    delete_file(p, &mut success, &mut failed)
                 }
             }
 
-            WildCardType::Normal => {
-                delete_file(p,&mut success,&mut failed)
-            }
+            WildCardType::Normal => delete_file(p, &mut success, &mut failed),
         }
     }
 
-    println!("Operation ended with {} completed {} failed",success,failed);
+    println!(
+        "Operation ended with {} completed {} failed",
+        success, failed
+    );
 }
 
-fn delete_file(p:&Path, success: &mut i32, failed: &mut i32) {
+fn delete_file(p: &Path, success: &mut i32, failed: &mut i32) {
     match std::fs::remove_file(p) {
         Ok(_) => {
             *success += 1;
         }
 
         Err(err) => {
-            eprintln!("{}",err);
+            eprintln!("{}", err);
             *failed += 1;
         }
     }

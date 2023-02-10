@@ -4,7 +4,7 @@ pub enum WildCardType {
     AllFile,
     SpecificExt,
     SpecificFileName,
-    Normal
+    Normal,
 }
 
 pub fn wild_card(base: &Path) -> WildCardType {
@@ -12,9 +12,11 @@ pub fn wild_card(base: &Path) -> WildCardType {
     let file_ext = base.extension();
     if file_name.unwrap().to_str().unwrap() == "*" && file_ext.is_none() {
         return WildCardType::AllFile;
-    }else if file_name.unwrap().to_str().unwrap() != "*" && file_ext.unwrap().to_str().unwrap() == "*" {
+    } else if file_name.unwrap().to_str().unwrap() != "*"
+        && file_ext.unwrap().to_str().unwrap() == "*"
+    {
         return WildCardType::SpecificExt;
-    }else if file_name.unwrap().to_str().unwrap() == "*" && file_ext.is_some() {
+    } else if file_name.unwrap().to_str().unwrap() == "*" && file_ext.is_some() {
         return WildCardType::SpecificFileName;
     }
     WildCardType::Normal
