@@ -1,28 +1,16 @@
 use std::path::Path;
 
-pub fn wild_card_file_ext(base: &Path) -> Vec<String> {
-    let mut available_ext:Vec<&str> = vec![];
-    let entries = std::fs::read_dir(".").unwrap();
+pub enum WildCardType {
+    AllFile,
+    SpecificExt,
+    Normal
+}
 
-    for entry in entries {
-        println!("{:?}", entry.unwrap().file_name());
+pub fn wild_card(base: &Path) -> WildCardType {
+    let file_name = base.file_name().unwrap().to_str().unwrap();
+    let file_ext = base.extension();
+    if file_name == "*" && file_ext.is_none() {
+        return WildCardType::AllFile;
     }
-    // for i in std::fs::read_dir("./").unwrap() {
-    //
-    //     let path = Path::new(i.unwrap().file_name().to_str().unwrap());
-    //     match path.exists() {
-    //         true => {}
-    //         false => {
-    //             continue;
-    //         }
-    //     }
-    //     available_ext.push(path.to_str().unwrap());
-    // }
-    let mut files:Vec<String> = vec![];
-    // let file_name = base.file_name().unwrap().to_str().unwrap();
-    // for i in &available_ext {
-    //     println!("{}.{}",file_name,i);
-    //     files.push(format!("{}.{}",file_name,i))
-    // }
-    files
+    WildCardType::Normal
 }

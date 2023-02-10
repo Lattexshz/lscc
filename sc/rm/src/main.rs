@@ -1,4 +1,6 @@
 use std::path::Path;
+use libsc::{wild_card, WildCardType};
+
 fn main() {
     let mut args:Vec<String> = std::env::args().collect();
     if args.len() == 1 {
@@ -14,25 +16,35 @@ fn main() {
 }
 
 pub fn rm(p: Vec<&Path>) {
-    let mut count = 1;
-    let len = p.len();
-
     let mut success = 0;
     let mut failed = 0;
     for p in p {
-        println!("Removing files... {} of {} ",count,len);
-        match std::fs::remove_file(p) {
-            Ok(_) => {
-                success += 1;
+        match wild_card(p) {
+            WildCardType::AllFile => {
+                let entries = std::fs::read_dir(".").unwrap();
+                for entry in entries {
+                    delete_file(&entry.as_ref().unwrap().path(),&mut success,&mut failed)
+                }
             }
-
-            Err(err) => {
-                eprintln!("{}",err);
-                failed += 1;
+            WildCardType::SpecificExt => {}
+            WildCardType::Normal => {
+                delete_file(p,&mut success,&mut failed)
             }
         }
-        count += 1;
     }
 
     println!("Operation ended with {} completed {} failed",success,failed);
+}
+
+fn delete_file(p:&Path, success: &mut i32, failed: &mut i32) {
+    match std::fs::remove_file(p) {
+        Ok(_) => {
+            *success += 1;
+        }
+
+        Err(err) => {
+            eprintln!("{}",err);
+            *failed += 1;
+        }
+    }
 }
