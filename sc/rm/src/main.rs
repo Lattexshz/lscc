@@ -110,3 +110,32 @@ fn delete_file(p: &Path, success: &mut i32, failed: &mut i32) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    #[test]
+    fn delete() {
+        std::fs::File::create("test.txt").unwrap();
+        crate::rm(vec![Path::new("test.txt")]);
+    }
+
+    #[test]
+    fn wild_card() {
+        std::fs::File::create("test.txt").unwrap();
+        crate::rm(vec![Path::new("*")]);
+    }
+
+    #[test]
+    fn wild_card_stem() {
+        std::fs::File::create("test.txt").unwrap();
+        crate::rm(vec![Path::new("*.txt")]);
+    }
+
+    #[test]
+    fn wild_card_ext() {
+        std::fs::File::create("test.txt").unwrap();
+        crate::rm(vec![Path::new("test.*")]);
+    }
+}
