@@ -26,7 +26,35 @@ pub fn rm(p: Vec<&Path>) {
                     delete_file(&entry.as_ref().unwrap().path(),&mut success,&mut failed)
                 }
             }
-            WildCardType::SpecificExt => {}
+
+            WildCardType::SpecificExt => {
+                // wcefew.*
+            }
+
+            WildCardType::SpecificFileName => {
+                let entries = std::fs::read_dir(".").unwrap();
+                let ext = p.extension().unwrap().to_str().unwrap();
+                for entry in entries {
+
+                    let mut p = &mut entry.as_ref().unwrap().path();
+                    p.set_extension(ext);
+                    match p.exists() {
+                        true => {
+                            match p.is_dir() {
+                                true => {
+                                    continue;
+                                }
+                                false => {}
+                            }
+                        }
+                        false => {
+                            continue;
+                        }
+                    }
+                    delete_file(p,&mut success,&mut failed)
+                }
+            }
+
             WildCardType::Normal => {
                 delete_file(p,&mut success,&mut failed)
             }
