@@ -1,3 +1,6 @@
+use std::ffi::OsStr;
+use std::fs::DirEntry;
+use std::io::Error;
 use std::path::Path;
 use libsc::{wild_card, WildCardType};
 
@@ -29,9 +32,47 @@ pub fn rm(p: Vec<&Path>) {
 
             WildCardType::SpecificExt => {
                 // wcefew.*
+
+                let entries = std::fs::read_dir(".").unwrap();
+                let mut file = p.to_path_buf();
+                for entry in entries {
+
+                    let mut cp = match &mut entry.as_ref() {
+                        Ok(entry) => entry.path(),
+                        Err(_) => {
+                            continue;
+                        }
+                    };
+
+                    let ext = match cp.extension() {
+                        None => {
+                            continue;
+                        }
+                        Some(ext) => ext.to_str().unwrap()
+                    };
+
+                    file.set_extension(ext);
+
+                    match file.exists() {
+                        true => {
+                            match file.is_dir() {
+                                true => {
+                                    continue;
+                                }
+                                false => {}
+                            }
+                        }
+                        false => {
+                            continue;
+                        }
+                    }
+
+                    delete_file(&file,&mut success,&mut failed)
+                }
             }
 
             WildCardType::SpecificFileName => {
+                //*.py
                 let entries = std::fs::read_dir(".").unwrap();
                 let ext = p.extension().unwrap().to_str().unwrap();
                 for entry in entries {
@@ -51,6 +92,7 @@ pub fn rm(p: Vec<&Path>) {
                             continue;
                         }
                     }
+                    println!("{}",p.display());
                     delete_file(p,&mut success,&mut failed)
                 }
             }
