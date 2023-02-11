@@ -1,4 +1,7 @@
+#![feature(file_set_times)]
+
 pub mod rm;
+pub mod touch;
 
 use std::path::Path;
 

@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "sc/rm",
+    "sc/touch",
     "sc/sc"
 ]
