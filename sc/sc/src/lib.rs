@@ -1,3 +1,5 @@
+pub mod rm;
+
 use std::path::Path;
 
 pub enum WildCardType {
